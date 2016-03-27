@@ -5,9 +5,11 @@
     tools:context="com.ohyuna.healthtracker.PatientGraphsFragment">
 
     <!-- TODO: Update blank fragment layout -->
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
 
+    <ImageView
+        android:layout_width="350dp"
+        android:layout_height="300dp"
+        android:id="@+id/imageView"
+        android:layout_gravity="center_horizontal|top"
+        android:background="@color/accent_material_dark" />
 </FrameLayout>

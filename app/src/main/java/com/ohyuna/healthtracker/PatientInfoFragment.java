@@ -4,12 +4,14 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.text.Editable;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -33,22 +35,27 @@ public class PatientInfoFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+    private boolean editing = false;
 
-    @Bind(R.id.firstName2)
+    @Bind(R.id.firstName)
     EditText firstName;
-    @Bind(R.id.lastName2)
+    @Bind(R.id.lastName)
     EditText lastName;
-    @Bind(R.id.age2)
-    EditText age;
-    @Bind(R.id.height2)
+    @Bind(R.id.bDay)
+    EditText bDay;
+    @Bind(R.id.bMonth)
+    EditText bMonth;
+    @Bind(R.id.bYear)
+    EditText bYear;
+    @Bind(R.id.height)
     EditText height;
-    @Bind(R.id.weight2)
+    @Bind(R.id.weight)
     EditText weight;
-    @Bind(R.id.weightAge2)
+    @Bind(R.id.weightAge)
     TextView weightAge;
-    @Bind(R.id.weightHeight2)
+    @Bind(R.id.weightHeight)
     TextView weightHeight;
-    @Bind(R.id.heightAge2)
+    @Bind(R.id.heightAge)
     TextView heightAge;
     @Bind(R.id.editSave)
     Button editSave;
@@ -94,7 +101,104 @@ public class PatientInfoFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_patient_view_info, container, false);
         ButterKnife.bind(this, view);
+        editSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (editing) {
+                    firstName.setFocusableInTouchMode(false);
+                    lastName.setFocusableInTouchMode(false);
+                    bDay.setFocusableInTouchMode(false);
+                    bMonth.setFocusableInTouchMode(false);
+                    bYear.setFocusableInTouchMode(false);
+                    weight.setFocusableInTouchMode(false);
+                    height.setFocusableInTouchMode(false);
+                    editSave.setText("Edit");
+                    editing = false;
+                } else {
+                    editing = true;
+                    firstName.setFocusableInTouchMode(true);
+                    lastName.setFocusableInTouchMode(true);
+                    bDay.setFocusableInTouchMode(true);
+                    bMonth.setFocusableInTouchMode(true);
+                    bYear.setFocusableInTouchMode(true);
+                    weight.setFocusableInTouchMode(true);
+                    height.setFocusableInTouchMode(true);
+                    editSave.setText("Save");
+                }
+            }
+        });
+        bDay.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                updateZ();
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        bMonth.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                updateZ();
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        bYear.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                updateZ();
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        height.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                updateZ();
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
+        weight.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                updateZ();
+            }
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
         return view;
+    }
+
+    public void updateZ() {
+        double heightAgeNum;
+        double weightAgeNum;
+        double weightHeightNum;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
