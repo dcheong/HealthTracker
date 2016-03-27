@@ -201,11 +201,13 @@ public class Create extends AppCompatActivity {
             if (m == Integer.parseInt(bMonth.getText().toString()) && d < Integer.parseInt(bDay.getText().toString())) {
                 --a;
             }
-            if(a<5) {
+            if(a<3) {
+                headCirc.setAlpha(1);
                 headCirc.setFocusableInTouchMode(true);
             } else {
                 headCirc.setText(null);
                 headCirc.setFocusableInTouchMode(false);
+                headCirc.setAlpha(0.5f);
             }
             return a;
         }
