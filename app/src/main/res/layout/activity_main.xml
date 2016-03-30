@@ -19,7 +19,6 @@
         android:layout_alignEnd="@+id/password"
         android:layout_alignLeft="@+id/password"
         android:layout_alignStart="@+id/password"
-        android:textColor="@color/button_material_light"
         android:hint="username" />
 
     <EditText
@@ -30,7 +29,6 @@
         android:id="@+id/password"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
-        android:textColor="@color/button_material_light"
         android:hint="password" />
 
     <Button

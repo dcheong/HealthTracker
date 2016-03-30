@@ -65,7 +65,7 @@ public class Landing extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 popup.dismiss();
-                Intent intent = new Intent(Landing.this, PatientView.class);
+                Intent intent = new Intent(Landing.this, SearchResultsActivity.class);
                 startActivity(intent);
             }
         });

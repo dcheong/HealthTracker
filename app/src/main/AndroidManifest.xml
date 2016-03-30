@@ -20,7 +20,8 @@
         <activity
             android:name=".PatientView"
             android:label="@string/title_activity_patient_view"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".SearchResultsActivity"></activity>
     </application>
 
 </manifest>

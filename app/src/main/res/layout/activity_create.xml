@@ -41,12 +41,11 @@
         android:id="@+id/lastName"
         android:height="50dp"
         android:hint="Last Name"
-        android:layout_below="@+id/firstName"
+        android:layout_below="@+id/secondName"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_toStartOf="@+id/image"
-        android:layout_alignRight="@+id/firstName"
-        android:layout_alignEnd="@+id/firstName" />
+        android:layout_alignRight="@+id/secondName"
+        android:layout_alignEnd="@+id/secondName" />
 
     <EditText
         android:layout_width="100dp"
@@ -57,10 +56,9 @@
         android:hint="height"
         android:width="150px"
         android:textAlignment="textEnd"
-        android:layout_below="@+id/heightAge"
+        android:layout_above="@+id/weight"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="22dp" />
+        android:layout_alignParentStart="true" />
 
     <EditText
         android:layout_width="100dp"
@@ -71,10 +69,10 @@
         android:hint="weight"
         android:width="150px"
         android:textAlignment="textEnd"
-        android:layout_marginTop="27dp"
-        android:layout_below="@+id/height"
+        android:layout_above="@+id/done"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_marginBottom="23dp" />
 
     <Button
         android:layout_width="wrap_content"
@@ -84,16 +82,16 @@
         android:width="200px"
         android:textColor="@color/abc_primary_text_material_dark"
         android:height="100px"
+        android:background="@android:color/holo_red_light"
         android:layout_alignParentBottom="true"
-        android:layout_alignLeft="@+id/textView"
-        android:layout_alignStart="@+id/textView"
-        android:background="@android:color/holo_red_light" />
+        android:layout_alignLeft="@+id/weightHeight"
+        android:layout_alignStart="@+id/weightHeight" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Cancel"
-        android:id="@+id/cancel"
+        android:id="@+id/done"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -107,11 +105,13 @@
         android:layout_height="wrap_content"
         android:text="Z-Scores"
         android:id="@+id/textView"
-        android:textSize="30dp"
-        android:layout_marginTop="16dp"
-        android:layout_below="@+id/image"
+        android:textSize="24dp"
+        android:layout_above="@+id/textView5"
         android:layout_alignRight="@+id/image"
-        android:layout_alignEnd="@+id/image" />
+        android:layout_alignEnd="@+id/image"
+        android:layout_alignLeft="@+id/heightAge"
+        android:layout_alignStart="@+id/heightAge"
+        android:gravity="center" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -139,7 +139,7 @@
         android:text="0"
         android:gravity="center_vertical"
         android:id="@+id/heightAge"
-        android:layout_below="@+id/textView"
+        android:layout_alignTop="@+id/textView5"
         android:layout_toLeftOf="@+id/textView5"
         android:layout_toStartOf="@+id/textView5" />
 
@@ -169,7 +169,7 @@
         android:text="height-for-age"
         android:id="@+id/textView5"
         android:gravity="center_vertical"
-        android:layout_below="@+id/textView"
+        android:layout_above="@+id/textView6"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
@@ -202,9 +202,10 @@
         android:hint="dd"
         android:gravity="center"
         android:nextFocusDown="@+id/bMonth"
-        android:layout_alignTop="@+id/bMonth"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_above="@+id/textView12"
+        android:layout_toLeftOf="@+id/bMonth"
+        android:layout_toStartOf="@+id/bMonth"
+        android:layout_marginBottom="20dp" />
 
     <EditText
         android:layout_width="40dp"
@@ -215,9 +216,9 @@
         android:hint="mm"
         android:gravity="center"
         android:nextFocusDown="@+id/bYear"
-        android:layout_alignBottom="@+id/textView"
-        android:layout_alignLeft="@+id/cancel"
-        android:layout_alignStart="@+id/cancel" />
+        android:layout_alignTop="@+id/bDay"
+        android:layout_alignLeft="@+id/done"
+        android:layout_alignStart="@+id/done" />
 
     <EditText
         android:layout_width="80dp"
@@ -227,7 +228,7 @@
         android:id="@+id/bYear"
         android:hint="yyyy"
         android:gravity="center"
-        android:layout_alignBottom="@+id/textView"
+        android:layout_alignTop="@+id/bMonth"
         android:layout_toRightOf="@+id/bMonth"
         android:layout_toEndOf="@+id/bMonth" />
 
@@ -251,8 +252,8 @@
         android:text="cm"
         android:id="@+id/textView10"
         android:layout_alignBottom="@+id/headCirc"
-        android:layout_alignRight="@+id/cancel"
-        android:layout_alignEnd="@+id/cancel"
+        android:layout_alignRight="@+id/done"
+        android:layout_alignEnd="@+id/done"
         android:gravity="center_vertical"
         android:focusable="false" />
 
@@ -261,9 +262,9 @@
         android:layout_height="wrap_content"
         android:id="@+id/gender"
         android:checked="false"
-        android:layout_above="@+id/textView"
-        android:layout_alignRight="@+id/headCirc"
-        android:layout_alignEnd="@+id/headCirc" />
+        android:layout_below="@+id/image"
+        android:layout_toLeftOf="@+id/textView11"
+        android:layout_toStartOf="@+id/textView11" />
 
     <TextView
         android:layout_width="28dp"
@@ -271,7 +272,7 @@
         android:text="M"
         android:id="@+id/textView9"
         android:gravity="center"
-        android:layout_alignBottom="@+id/gender"
+        android:layout_alignTop="@+id/gender"
         android:layout_toLeftOf="@+id/gender"
         android:layout_toStartOf="@+id/gender" />
 
@@ -281,8 +282,40 @@
         android:text="F"
         android:id="@+id/textView11"
         android:gravity="center"
-        android:layout_alignBottom="@+id/gender"
-        android:layout_toRightOf="@+id/gender"
-        android:layout_toEndOf="@+id/gender" />
+        android:layout_alignTop="@+id/gender"
+        android:layout_toRightOf="@+id/headCirc"
+        android:layout_toEndOf="@+id/headCirc" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/secondName"
+        android:hint="Second Name"
+        android:layout_below="@+id/firstName"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignRight="@+id/firstName"
+        android:layout_alignEnd="@+id/firstName" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Measurements"
+        android:id="@+id/textView12"
+        android:layout_above="@+id/headCirc"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignRight="@+id/bYear"
+        android:layout_alignEnd="@+id/bYear"
+        android:textSize="24dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:id="@+id/age"
+        android:layout_alignBottom="@+id/bYear"
+        android:layout_alignLeft="@+id/textView"
+        android:layout_alignStart="@+id/textView"
+        android:gravity="center_vertical" />
 
 </RelativeLayout>
