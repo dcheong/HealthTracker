@@ -6,7 +6,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.ohyuna.healthtracker.PatientView$PatientInfoFragment">
+    tools:context=".PatientViewMockup$PatientInfoFragment">
 
     <com.ohyuna.healthtracker.CircleImageView
         android:layout_width="150dp"
@@ -16,6 +16,7 @@
         android:minWidth="150dp"
         android:layout_alignParentTop="true"
         android:layout_alignLeft="@+id/heightAge"
+        android:focusable="false"
         android:layout_alignStart="@+id/heightAge" />
 
     <EditText
@@ -28,8 +29,8 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_toStartOf="@+id/image"
-        android:text="Yuna"
         android:layout_toLeftOf="@+id/image"
+        android:inputType="textNoSuggestions"
         android:focusable="false"
         />
 
@@ -44,7 +45,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignRight="@+id/secondName"
         android:layout_alignEnd="@+id/secondName"
-        android:text="Oh"
+        android:inputType="textNoSuggestions"
         android:focusable="false"
         />
 
@@ -57,7 +58,6 @@
         android:hint="height"
         android:width="150px"
         android:textAlignment="textEnd"
-        android:text="100"
         android:layout_above="@+id/weight"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -74,7 +74,6 @@
         android:width="150px"
         android:textAlignment="textEnd"
         android:layout_marginBottom="10dp"
-        android:text="15"
         android:layout_above="@+id/done"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -209,7 +208,6 @@
         android:hint="dd"
         android:gravity="center"
         android:nextFocusDown="@+id/bMonth"
-        android:text="10"
         android:layout_below="@+id/gender"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -225,7 +223,6 @@
         android:hint="mm"
         android:gravity="center"
         android:nextFocusDown="@+id/bYear"
-        android:text="10"
         android:layout_below="@+id/textView9"
         android:layout_toRightOf="@+id/bDay"
         android:layout_toEndOf="@+id/bDay"
@@ -240,7 +237,6 @@
         android:id="@+id/bYear"
         android:hint="yyyy"
         android:gravity="center"
-        android:text="2014"
         android:layout_below="@+id/textView11"
         android:layout_toRightOf="@+id/bMonth"
         android:layout_toEndOf="@+id/bMonth"
@@ -256,7 +252,6 @@
         android:hint="head"
         android:gravity="end"
         android:focusable="false"
-        android:text="25"
         android:layout_alignBaseline="@+id/heightAge"
         android:layout_alignBottom="@+id/heightAge"
         android:layout_alignParentLeft="true"
@@ -314,7 +309,6 @@
         android:layout_alignParentStart="true"
         android:layout_alignRight="@+id/firstName"
         android:layout_alignEnd="@+id/firstName"
-        android:text="Hailey"
         android:focusable="false" />
 
     <TextView

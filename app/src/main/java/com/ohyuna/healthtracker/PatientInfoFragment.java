@@ -1,8 +1,15 @@
 package com.ohyuna.healthtracker;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -15,6 +22,9 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.text.Editable;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.Calendar;
 
 import butterknife.Bind;
@@ -40,6 +50,10 @@ public class PatientInfoFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private boolean editing = false;
+
+    private int patientid;
+    private Patient patient;
+    private DBManager db;
 
     private int ageNum,heightNum,weightNum;
     private int ageinDays, ageinMonths;
@@ -117,21 +131,40 @@ public class PatientInfoFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+        this.patientid = ((PatientView) getActivity()).patientid;
+        System.out.println("patientid is" + this.patientid);
 
+        db = new DBManager(getActivity());
+        db.start();
         View view = inflater.inflate(R.layout.fragment_patient_view_info, container, false);
         ButterKnife.bind(this, view);
-        calcAge();
         zscore = new ZScore(super.getContext());
-
-        updateZ();
         ageNum = 0; heightNum=0; weightNum=0;
         ageinDays = 0; ageinMonths=0;
-        gen = false;
+        gen=false;
+        setImage();
+        updateInfo();
+        calcAge();
+        updateZ();
+
+
 
         editSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (editing) {
+                    db.updatePatient(patientid,
+                            Double.parseDouble(height.getText().toString()),
+                            Double.parseDouble(weight.getText().toString()),
+                            Double.parseDouble(headCirc.getText().toString()),
+                            Double.parseDouble(heightAge.getText().toString()),
+                            Double.parseDouble(weightAge.getText().toString()),
+                            Double.parseDouble(weightHeight.getText().toString()));
+                    updateInfo();
+                    BitmapDrawable bMap = (BitmapDrawable) pImage.getDrawable();
+                    if (bMap != null) {
+                        savePicture(bMap.getBitmap(), String.valueOf(patientid));
+                    }
                     firstName.setFocusableInTouchMode(false);
                     secondName.setFocusableInTouchMode(false);
                     lastName.setFocusableInTouchMode(false);
@@ -141,6 +174,7 @@ public class PatientInfoFragment extends Fragment {
                     weight.setFocusableInTouchMode(false);
                     height.setFocusableInTouchMode(false);
                     headCirc.setFocusableInTouchMode(false);
+                    pImage.setFocusableInTouchMode(false);
                     gender.setClickable(false);
                     editSave.setText("Edit");
                     editing = false;
@@ -155,12 +189,20 @@ public class PatientInfoFragment extends Fragment {
                     weight.setFocusableInTouchMode(true);
                     height.setFocusableInTouchMode(true);
                     headCirc.setFocusableInTouchMode(true);
+                    pImage.setFocusableInTouchMode(true);
                     gender.setClickable(true);
                     editSave.setText("Save");
                 }
             }
         });
-        pImage.setImageResource(R.drawable.child1);
+        pImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(editing) {
+                    dispatchTakePictureIntent();
+                }
+            }
+        });
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -240,11 +282,11 @@ public class PatientInfoFragment extends Fragment {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked) {
                     genderString = "F";
-                    gen = false;
+                    gen = true;
                     updateZ();
                 } else {
                     genderString = "M";
-                    gen = true;
+                    gen = false;
                     updateZ();
                 }
             }
@@ -252,6 +294,63 @@ public class PatientInfoFragment extends Fragment {
         return view;
     }
 
+    public void updateInfo() {
+        patient = db.getPatientMostRecent(patientid);
+        gen = patient.gender;
+        firstName.setText(patient.first);
+        secondName.setText(patient.second);
+        lastName.setText(patient.last);
+        String[] bDayArray = patient.birth.split("-");
+        bDay.setText(bDayArray[0]);
+        bMonth.setText(bDayArray[1]);
+        bYear.setText(bDayArray[2]);
+        gender.setChecked(gen);
+        weight.setText(String.valueOf(patient.weight));
+        height.setText(String.valueOf(patient.height));
+        headCirc.setText(String.valueOf(patient.head));
+    }
+    public void setImage() {
+        String strDirectory = Environment.getExternalStorageDirectory().toString();
+        File imgFile = new File(strDirectory, String.valueOf(patientid));
+        if (imgFile.exists()) {
+            Bitmap bmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+            pImage.setImageBitmap(bmap);
+        }
+    }
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if(takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, 1);
+        }
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode==1 && resultCode == Activity.RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            pImage.setImageBitmap(imageBitmap);
+        }
+    }
+    private void savePicture(Bitmap bm, String imgName) {
+        OutputStream fOut = null;
+        String strDirectory = Environment.getExternalStorageDirectory().toString();
+
+        File f = new File(strDirectory, imgName);
+        try {
+            fOut = new FileOutputStream(f);
+
+            /**Compress image**/
+            bm.compress(Bitmap.CompressFormat.JPEG, 85, fOut);
+            fOut.flush();
+            fOut.close();
+
+            /**Update image to gallery**/
+            MediaStore.Images.Media.insertImage(getActivity().getContentResolver(),
+                    f.getAbsolutePath(), f.getName(), f.getName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     public void updateZ() {
         if(height.getText().toString().length()!=0 && ageinDays != -1) {
             String hA = String.format("%4.2f",zscore.getHA(Double.parseDouble(height.getText().toString()),ageinMonths, gen));
@@ -322,13 +421,16 @@ public class PatientInfoFragment extends Fragment {
             if (m == Integer.parseInt(bMonth.getText().toString()) && d < Integer.parseInt(bDay.getText().toString())) {
                 --a;
             }
-            if (a < 3) {
+            if (a < 3 && editing) {
                 headCirc.setAlpha(1);
                 headCirc.setFocusableInTouchMode(true);
             } else {
-                headCirc.setText(null);
-                headCirc.setFocusableInTouchMode(false);
-                headCirc.setAlpha(0.5f);
+                if (editing) {
+                    headCirc.setText(null);
+                    headCirc.setFocusableInTouchMode(false);
+                    headCirc.setAlpha(0.5f);
+                }
+
             }
             age.setText(am + " months " + a + " years");
             ageinDays = 365 * a + (int)(30.5 * am);
@@ -339,5 +441,15 @@ public class PatientInfoFragment extends Fragment {
             age.setText("");
             return -1;
         }
+    }
+    @Override
+    public void onPause() {
+        super.onPause();
+        db.close();
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        db.start();
     }
 }

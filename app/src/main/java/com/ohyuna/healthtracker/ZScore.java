@@ -35,7 +35,7 @@ public class ZScore {
         load(context);
     }
     public double getHA(double height, int age, boolean gender) {
-        if (gender) {
+        if (!gender) {
             if (age <= 24 && age >= 0) {
                 int row = age;
                 System.out.println("age" + age);
@@ -59,7 +59,7 @@ public class ZScore {
         }
     }
     public double getWA(double weight, int age, boolean gender) {
-        if (gender) {
+        if (!gender) {
             if (age <= 1856 && age >= 0) {
                 int row = age;
                 return bweightAge[row][1]-weight;
@@ -76,7 +76,7 @@ public class ZScore {
         }
     }
     public double getWH(double weight, double height, boolean gender) {
-        if (gender) {
+        if (!gender) {
             if (height <= 120.0 && height >= 65.0) {
                 int row = (int)height*10;
                 row -= 650;

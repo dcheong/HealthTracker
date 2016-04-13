@@ -18,9 +18,9 @@ import android.view.ViewGroup;
 
 import android.widget.TextView;
 
-public class PatientView extends AppCompatActivity
+public class PatientViewMockup extends AppCompatActivity
         implements PatientInfoFragment.OnFragmentInteractionListener,
-        PatientGraphsFragment.OnFragmentInteractionListener, GrowthHistoryFragment.OnFragmentInteractionListener, PatientNotesFragment.OnFragmentInteractionListener{
+        PatientGraphsFragment.OnFragmentInteractionListener{
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -30,10 +30,9 @@ public class PatientView extends AppCompatActivity
      * may be best to switch to a
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
-    public int patientid;
-    public String patientname;
+    public Patient patient;
     private SectionsPagerAdapter mSectionsPagerAdapter;
-    static final int NUM_ITEMS = 4;
+    static final int NUM_ITEMS = 2;
 
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -45,12 +44,9 @@ public class PatientView extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_patient_view);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        Bundle b = this.getIntent().getExtras();
-        patientid = b.getInt("patientid");
-        patientname = b.getString("patientname");
         setSupportActionBar(toolbar);
-        toolbar.setTitle(patientname);
-        getSupportActionBar().setTitle(patientname);
+        toolbar.setTitle("Yuna Hailey Oh");
+        getSupportActionBar().setTitle("Yuna Hailey Oh");
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -105,10 +101,6 @@ public class PatientView extends AppCompatActivity
                     return new PatientInfoFragment();
                 case 1:
                     return new PatientGraphsFragment();
-                case 2:
-                    return new GrowthHistoryFragment();
-                case 3:
-                    return new PatientNotesFragment();
             }
             return null;
         }
@@ -123,13 +115,9 @@ public class PatientView extends AppCompatActivity
         public CharSequence getPageTitle(int position) {
             switch (position) {
                 case 0:
-                    return "INFO";
+                    return "PATIENT INFO";
                 case 1:
                     return "GRAPHS";
-                case 2:
-                    return "TABLES";
-                case 3:
-                    return "NOTES";
             }
             return null;
         }
@@ -137,8 +125,4 @@ public class PatientView extends AppCompatActivity
     public void onFragmentInteraction(Uri uri) {
 
     }
-    public void onGHInteraction(Uri uri) {
-
-    }
-
 }

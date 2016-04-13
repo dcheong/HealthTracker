@@ -55,11 +55,11 @@ public class CircleImageView extends ImageView {
             b = ((BitmapDrawable) drawable).getBitmap();
         }
 
-        Bitmap bitmap = b.copy(Bitmap.Config.ARGB_8888, true);
+        //Bitmap bitmap = b.copy(Bitmap.Config.RGB_565, true);
 
         int w = getWidth(), h = getHeight();
 
-        Bitmap roundBitmap =  getCroppedBitmap(bitmap, w);
+        Bitmap roundBitmap =  getCroppedBitmap(b, w);
         canvas.drawBitmap(roundBitmap, 0,0, null);
     }
 

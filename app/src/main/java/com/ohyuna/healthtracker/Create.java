@@ -1,5 +1,12 @@
 package com.ohyuna.healthtracker;
 
+import android.app.Application;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -8,12 +15,16 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.util.Calendar;
 
 public class Create extends AppCompatActivity {
@@ -22,6 +33,8 @@ public class Create extends AppCompatActivity {
     private String genderString;
     private boolean gen;
     private ZScore zscore;
+    @Bind(R.id.image)
+    ImageView image;
     @Bind(R.id.firstName)
     EditText firstName;
     @Bind(R.id.secondName)
@@ -63,7 +76,7 @@ public class Create extends AppCompatActivity {
         ageNum = 0; heightNum = 0; weightNum = 0;
         ageinDays = 0; ageinMonths = 0;
         genderString = "M";
-        gen = true;
+        gen = false;
         zscore = new ZScore(this);
         cancel.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -75,6 +88,7 @@ public class Create extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 writePatient();
+                finish();
             }
         });
         bDay.addTextChangedListener(new TextWatcher() {
@@ -150,16 +164,55 @@ public class Create extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if(isChecked) {
                     genderString = "F";
-                    gen = false;
+                    gen = true;
                     updateZ();
                 } else {
                     genderString = "M";
-                    gen = true;
+                    gen = false;
                     updateZ();
                 }
             }
         });
+        image.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                dispatchTakePictureIntent();
+            }
+        });
+    }
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            if(takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                startActivityForResult(takePictureIntent, 1);
+            }
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(requestCode==1 && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            image.setImageBitmap(imageBitmap);
+        }
+    }
+    private void savePicture(Bitmap bm, String imgName) {
+        OutputStream fOut = null;
+        String strDirectory = Environment.getExternalStorageDirectory().toString();
 
+        File f = new File(strDirectory, imgName);
+        try {
+            fOut = new FileOutputStream(f);
+
+            /**Compress image**/
+            bm.compress(Bitmap.CompressFormat.JPEG, 85, fOut);
+            fOut.flush();
+            fOut.close();
+
+            /**Update image to gallery**/
+            MediaStore.Images.Media.insertImage(getContentResolver(),
+                    f.getAbsolutePath(), f.getName(), f.getName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     public void updateZ() {
         if(height.getText().toString().length()!=0 && ageinDays != -1) {
@@ -177,25 +230,25 @@ public class Create extends AppCompatActivity {
         }
     }
     public void writePatient() {
-/*        JSONObject pat = new JSONObject();
-        pat.put("Gender", genderString);
-        pat.put("First Name", firstName.getText());
-        pat.put("Second Name", secondName.getText());
-        pat.put("Last Name", lastName.getText());
-        pat.put("Birth Date", bDay.getText() + "/" + bMonth.getText() + "/" + bYear.getText());
-        pat.put("Height", height.getText());
-        pat.put("Weight", weight.getText());
-        pat.put("Head", headCirc.getText());
-        String patString = pat.toString();
-        File file = getFileStreamPath(firstName.getText().toString() + secondName.getText().toString() + lastName.getText().toString() + ".txt");
-        file.createNewFile();
-        FileOutputStream writer = openFileOutput(file.getName(), Context.MODE_APPEND);
-        writer.write(patString.getBytes());
-        writer.flush();
-        writer.close();
-        System.out.println("file written");*/
-
-
+        DBManager db = new DBManager(Create.this);
+        db.start();
+        String birthdate = bDay.getText().toString() + "-" + bMonth.getText().toString() + "-" + bYear.getText().toString();
+        int patientid = db.newPatient(firstName.getText().toString(),
+                secondName.getText().toString(),
+                lastName.getText().toString(),
+                birthdate,
+                Double.parseDouble(height.getText().toString()),
+                Double.parseDouble(weight.getText().toString()),
+                Double.parseDouble(headCirc.getText().toString()),
+                Double.parseDouble(heightAge.getText().toString()),
+                Double.parseDouble(weightAge.getText().toString()),
+                Double.parseDouble(weightHeight.getText().toString()),
+                gen);
+        BitmapDrawable bMap = (BitmapDrawable) image.getDrawable();
+        if (bMap != null) {
+            savePicture(bMap.getBitmap(), String.valueOf(patientid));
+        }
+        db.close();
     }
     public double calcAge() {
         if(!(bYear.getText().length()==0 || bMonth.getText().length()==0 || bDay.getText().length()==0)) {

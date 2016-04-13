@@ -7,36 +7,30 @@ import org.json.JSONObject;
  * Created by Douglas on 3/18/2016.
  */
 public class Patient {
-    private String firstName;
-    private String lastName;
-    private int age;
-    private int height;
-    private int weight;
-    public Patient(){}
-    public Patient(JSONObject patient) {
-        try {
-            firstName = patient.getString("firstName");
-            lastName = patient.getString("lastName");
-            age = patient.getInt("age");
-            height = patient.getInt("height");
-            weight = patient.getInt("weight");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+    public int id;
+    public String first;
+    public String second;
+    public String last;
+    public String birth;
+    public double height;
+    public double weight;
+    public double head;
+    public boolean gender;
+    public Patient(int id, String first, String second, String last, String birth) {
+        this(id, first,second, last, birth, 0, 0, 0, false);
     }
-    public String getFirstName() {
-        return firstName;
+    public Patient(int id, String first, String second, String last, String birth, double height, double weight, double head, boolean gender){
+        this.id = id;
+        this.first = first;
+        this.second = second;
+        this.last = last;
+        this.birth = birth;
+        this.height = height;
+        this.weight = weight;
+        this.head = head;
+        this.gender = gender;
     }
-    public String getLastName() {
-        return lastName;
-    }
-    public int getAge() {
-        return age;
-    }
-    public int getHeight() {
-        return height;
-    }
-    public int getWeight() {
-        return weight;
+    public boolean equals(Patient patient) {
+        return(patient.id == id);
     }
 }
