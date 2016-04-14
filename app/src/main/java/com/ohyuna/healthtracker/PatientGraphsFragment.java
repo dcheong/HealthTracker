@@ -1,12 +1,25 @@
 package com.ohyuna.healthtracker;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.DashPathEffect;
+import android.graphics.Paint;
+import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 
 /**
@@ -20,6 +33,8 @@ import android.view.ViewGroup;
 public class PatientGraphsFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private DBManager db;
+
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
@@ -32,6 +47,12 @@ public class PatientGraphsFragment extends Fragment {
     public PatientGraphsFragment() {
         // Required empty public constructor
     }
+
+    ImageView iv, iv1, iv2;
+    Bitmap bmap, bmap1, bmap2;
+    Canvas cv, cv1, cv2;
+    Paint paint;
+    int patientid;
 
     /**
      * Use this factory method to create a new instance of
@@ -61,10 +82,84 @@ public class PatientGraphsFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_patient_graphs, container, false);
+        View view = inflater.inflate(R.layout.fragment_patient_graphs, container, false);
+        patientid = ((PatientView) getActivity()).patientid;
+        db = new DBManager(getActivity());
+        db.start();
+        Patient forGender = db.getPatientMostRecent(patientid);
+        boolean gender = forGender.gender;
+        db.close();
+        startGraphs(gender);
+        iv = (ImageView) view.findViewById(R.id.iv);
+        iv1 = (ImageView) view.findViewById(R.id.iv1);
+        iv2 = (ImageView) view.findViewById(R.id.iv2);
+        Bitmap temp = Bitmap.createBitmap(bmap.getWidth(), bmap.getHeight(), bmap.getConfig());
+        Bitmap temp1 = Bitmap.createBitmap(bmap1.getWidth(), bmap1.getHeight(), bmap1.getConfig());
+        Bitmap temp2 = Bitmap.createBitmap(bmap2.getWidth(), bmap2.getHeight(), bmap2.getConfig());
+        Canvas cv = new Canvas(temp);
+        Canvas cv1 = new Canvas(temp1);
+        Canvas cv2 = new Canvas(temp2);
+        cv.drawBitmap(bmap,0,0,null);
+        cv1.drawBitmap(bmap1, 0, 0, null);
+        cv2.drawBitmap(bmap2, 0, 0, null);
+        paint = new Paint();
+        paint.setColor(Color.rgb(0,0,0));
+        paint.setStrokeWidth(10);
+        drawPoints(db, cv, cv1, cv2, gender, paint);
+        iv.setImageDrawable(new BitmapDrawable(getActivity().getResources(), temp));
+        iv1.setImageDrawable(new BitmapDrawable(getActivity().getResources(), temp1));
+        iv2.setImageDrawable(new BitmapDrawable(getActivity().getResources(), temp2));
+
+        return view;
+    }
+    public void drawPoints(DBManager db, Canvas cv, Canvas cv1, Canvas cv2, boolean gender, Paint paint) {
+        db.start();
+        Patient forBirth = db.getPatientMostRecent(patientid);
+        String[] birthDate = forBirth.birth.split("-");
+        int bDay = Integer.parseInt(birthDate[0]);
+        int bMonth = Integer.parseInt(birthDate[1]);
+        int bYear = Integer.parseInt(birthDate[2]);
+        AgeCalc calc = new AgeCalc();
+        ArrayList<GHEntry> ghEntries = db.getPatientGH(patientid);
+        for (int i = 0; i < ghEntries.size(); i++) {
+            GHEntry gh = ghEntries.get(i);
+            String[] rDate = gh.date.split("-");
+            int rDay = Integer.parseInt(rDate[0]);
+            int rMonth = Integer.parseInt(rDate[1]);
+            int rYear = Integer.parseInt(rDate[2]);
+            double height = gh.height;
+            double weight = gh.weight;
+            int[] ageArray = calc.calculateAgeToDate(bDay, bMonth, bYear, rDay, rMonth, rYear);
+            int ageinMonths = ageArray[1] + ageArray[2] * 12;
+            float x1 = (float)(ageinMonths * 22.5 + 120);
+            float y1 = (float)((height-40) * -10.2353) + 910;
+            float zwamult = -30.0f;
+            if (gender) {
+                zwamult = -28.0645f;
+            }
+            float x2 = x1;
+            float y2 = (float)(height * zwamult) + 910;
+            float x3 = (float)(weight * 38.38) + 135;
+            float y3 = (float)((height - 45) * -11.4) + 900;
+            cv.drawPoint(x1,y1, paint);
+            cv1.drawPoint(x2,y2, paint);
+            cv2.drawPoint(x3,y3, paint);
+        }
+        db.close();
+    }
+
+    public void startGraphs(boolean gender) {
+        if (gender) {
+            bmap = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.zhagirls);
+            bmap1 = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.zwagirls);
+            bmap2 = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.zwhgirls);
+        } else {
+            bmap = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.zhaboys);
+            bmap1 = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.zwaboys);
+            bmap2 = BitmapFactory.decodeResource(getActivity().getResources(), R.drawable.zwhboys);
+        }
     }
 
     // TODO: Rename method, update argument and hook method into UI event

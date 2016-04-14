@@ -40,7 +40,7 @@ public class ZScore {
                 int row = age;
                 System.out.println("age" + age);
                 System.out.println(bheightAge1[row][1]);
-                System.out.println(bheightAge2[row][2]);
+                System.out.println(bheightAge1[row][2]);
                 return (bheightAge1[row][1] - height)/bheightAge1[row][2];
             } else if (age <= 60 && age >= 25) {
                 int row = age - 24;
@@ -59,9 +59,11 @@ public class ZScore {
         }
     }
     public double getWA(double weight, int age, boolean gender) {
+        System.out.println("Getting ZWA for weight " + weight + " age " + age);
         if (!gender) {
             if (age <= 1856 && age >= 0) {
                 int row = age;
+                System.out.println("Value was " + bweightAge[row][1]);
                 return bweightAge[row][1]-weight;
             } else {
                 return -1;
@@ -69,6 +71,7 @@ public class ZScore {
         } else {
             if (age <= 1856 && age >= 0) {
                 int row = age;
+                System.out.println("Value was " + gweightAge[row][1]);
                 return gweightAge[row][1]-weight;
             } else {
                 return -1;
@@ -76,13 +79,14 @@ public class ZScore {
         }
     }
     public double getWH(double weight, double height, boolean gender) {
+        System.out.println("Getting ZWH for weight " + weight + " height" + height);
         if (!gender) {
             if (height <= 120.0 && height >= 65.0) {
                 int row = (int)height*10;
                 row -= 650;
                 if (row < 0) {row=0;}
                 if (row > 55) {row=55;}
-                System.out.println(bweightHeight[row][1]);
+                System.out.println("Value was " + bweightHeight[row][1]);
                 return bweightHeight[row][1]-weight;
             } else {
                 return -1;
@@ -93,6 +97,7 @@ public class ZScore {
                 row -= 650;
                 if (row < 0) {row=0;}
                 if (row > 55) {row=55;}
+                System.out.println("Value was " + gweightHeight[row][1]);
                 return gweightHeight[row][1]-weight;
             } else {
                 return -1;

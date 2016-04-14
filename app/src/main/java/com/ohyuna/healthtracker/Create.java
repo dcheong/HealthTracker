@@ -97,7 +97,7 @@ public class Create extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                calcAge();
+                getAge();
                 updateZ();
             }
             @Override
@@ -111,7 +111,7 @@ public class Create extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                calcAge();
+                getAge();
                 updateZ();
             }
             @Override
@@ -125,7 +125,7 @@ public class Create extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                calcAge();
+                getAge();
                 updateZ();
             }
             @Override
@@ -233,13 +233,19 @@ public class Create extends AppCompatActivity {
         DBManager db = new DBManager(Create.this);
         db.start();
         String birthdate = bDay.getText().toString() + "-" + bMonth.getText().toString() + "-" + bYear.getText().toString();
+        Double hCirc;
+        if (headCirc.getText().toString().trim().length()>0) {
+            hCirc = Double.parseDouble(headCirc.getText().toString());
+        } else {
+            hCirc = 0.0;
+        }
         int patientid = db.newPatient(firstName.getText().toString(),
                 secondName.getText().toString(),
                 lastName.getText().toString(),
                 birthdate,
                 Double.parseDouble(height.getText().toString()),
                 Double.parseDouble(weight.getText().toString()),
-                Double.parseDouble(headCirc.getText().toString()),
+                hCirc,
                 Double.parseDouble(heightAge.getText().toString()),
                 Double.parseDouble(weightAge.getText().toString()),
                 Double.parseDouble(weightHeight.getText().toString()),
@@ -250,38 +256,22 @@ public class Create extends AppCompatActivity {
         }
         db.close();
     }
-    public double calcAge() {
+    public double getAge() {
         if(!(bYear.getText().length()==0 || bMonth.getText().length()==0 || bDay.getText().length()==0)) {
-            Calendar c = Calendar.getInstance();
-            int y, m, d, a, am;
-            y = c.get(Calendar.YEAR);
-            m = c.get(Calendar.MONTH);
-            d = c.get(Calendar.DAY_OF_MONTH);
-            a = y - Integer.parseInt(bYear.getText().toString());
-            am = 0;
-            if (m < Integer.parseInt(bMonth.getText().toString())) {
-                --a;
-                am = 12 - Integer.parseInt(bMonth.getText().toString()) + m;
-            }
-            if (m == Integer.parseInt(bMonth.getText().toString()) && d < Integer.parseInt(bDay.getText().toString())) {
-                --a;
-            }
-            if (a < 3) {
-                headCirc.setAlpha(1);
-                headCirc.setFocusableInTouchMode(true);
-            } else {
-                headCirc.setText(null);
-                headCirc.setFocusableInTouchMode(false);
-                headCirc.setAlpha(0.5f);
-            }
-            age.setText(am + " months " + a + " years");
-            ageinDays = 365 * a + (int)(30.5 * am);
-            ageinMonths = a * 12 + am;
-            return a;
+            int y = Integer.parseInt(bYear.getText().toString());
+            int m = Integer.parseInt(bMonth.getText().toString());
+            int d = Integer.parseInt(bDay.getText().toString());
+            AgeCalc calc = new AgeCalc();
+            int[] ageArray = calc.calculateAge(d,m,y);
+            age.setText(ageArray[0] + " days" + ageArray[1] + " months" + ageArray[2] + " years");
+            ageinDays = 365 * ageArray[2] + (int)(30.5 * ageArray[1]) + ageArray[0];
+            ageinMonths = 12 * ageArray[2] + ageArray[1] + (int) Math.round(ageArray[0]/30.5);
+            return ageArray[0];
         } else {
             ageinDays = -1;
             age.setText("");
             return -1;
         }
+
     }
 }
