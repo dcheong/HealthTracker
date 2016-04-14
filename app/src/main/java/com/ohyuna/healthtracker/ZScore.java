@@ -35,74 +35,98 @@ public class ZScore {
         load(context);
     }
     public double getHA(double height, int age, boolean gender) {
+        double zscore;
         if (!gender) {
             if (age <= 24 && age >= 0) {
                 int row = age;
                 System.out.println("age" + age);
                 System.out.println(bheightAge1[row][1]);
                 System.out.println(bheightAge1[row][2]);
-                return (bheightAge1[row][1] - height)/bheightAge1[row][2];
+                zscore = (height - bheightAge1[row][1])/bheightAge1[row][2];
             } else if (age <= 60 && age >= 25) {
                 int row = age - 24;
-                return (bheightAge2[row][1] - height)/bheightAge2[row][2];
+                zscore = (height - bheightAge2[row][1])/bheightAge2[row][2];
+            } else {
+                zscore = -6.0;
             }
-            return -1;
         } else {
             if (age <= 24 && age >= 0) {
                 int row = age;
-                return (gheightAge1[row][1] - height)/gheightAge1[row][2];
+                zscore = (height - gheightAge1[row][1])/gheightAge1[row][2];
             } else if (age <= 60 && age >= 25) {
                 int row = age - 24;
-                return (gheightAge2[row][1] - height)/gheightAge2[row][2];
+                zscore = (height - gheightAge2[row][1])/gheightAge2[row][2];
+            } else {
+                zscore = -6.0;
             }
-            return -1;
         }
+        if (zscore < -4.0) {
+            zscore = -4.0;
+        }
+        if (zscore > 4.0) {
+            zscore = 4.0;
+        }
+        return zscore;
     }
     public double getWA(double weight, int age, boolean gender) {
         System.out.println("Getting ZWA for weight " + weight + " age " + age);
+        double zscore;
         if (!gender) {
             if (age <= 1856 && age >= 0) {
                 int row = age;
                 System.out.println("Value was " + bweightAge[row][1]);
-                return bweightAge[row][1]-weight;
+                zscore = weight - bweightAge[row][1];
             } else {
-                return -1;
+                zscore = -6;
             }
         } else {
             if (age <= 1856 && age >= 0) {
                 int row = age;
                 System.out.println("Value was " + gweightAge[row][1]);
-                return gweightAge[row][1]-weight;
+                zscore = weight - gweightAge[row][1];
             } else {
-                return -1;
+                zscore = -6;
             }
         }
+        if (zscore < -4.0) {
+            zscore = -4.0;
+        }
+        if (zscore > 4.0) {
+            zscore = 4.0;
+        }
+        return zscore;
     }
     public double getWH(double weight, double height, boolean gender) {
-        System.out.println("Getting ZWH for weight " + weight + " height" + height);
+        System.out.println("Getting ZWH for weight " + weight + " height" + height + "gender = " + gender);
+        int row = (int)((height - 65) * 10.01818);
+        System.out.println("row: " + row);
+        double zscore;
         if (!gender) {
             if (height <= 120.0 && height >= 65.0) {
-                int row = (int)height*10;
-                row -= 650;
                 if (row < 0) {row=0;}
-                if (row > 55) {row=55;}
+                if (row > 550) {row=550;}
                 System.out.println("Value was " + bweightHeight[row][1]);
-                return bweightHeight[row][1]-weight;
+                zscore = weight - bweightHeight[row][1];
             } else {
-                return -1;
+                zscore = -6;
             }
         } else {
             if (height <= 120.0 && height >= 65.0) {
-                int row = (int)height*10;
-                row -= 650;
                 if (row < 0) {row=0;}
-                if (row > 55) {row=55;}
+                if (row > 550) {row=550;}
                 System.out.println("Value was " + gweightHeight[row][1]);
-                return gweightHeight[row][1]-weight;
+                zscore =  weight - gweightHeight[row][1];
             } else {
-                return -1;
+                zscore = -6;
             }
         }
+        if (zscore < -4.0) {
+            zscore = -4.0;
+        }
+        if (zscore > 4.0) {
+            zscore = 4.0;
+        }
+        return zscore;
     }
     public void load(Context context) {
         InputStream is1 = context.getResources().openRawResource(R.raw.bha_birth2);
@@ -184,10 +208,12 @@ public class ZScore {
         }
 
         bweightHeight = new double[bweightHeightRaw.size()-1][2];
+        System.out.println("raw height is:" + bweightHeightRaw.size());
         for (int i = 1; i < bweightHeightRaw.size()-1; i++) {
             String[] row = (String[]) (bweightHeightRaw.get(i));
             bweightHeight[i-1][0] = Double.parseDouble(row[0]);
             bweightHeight[i-1][1] = Double.parseDouble(row[5]);
+            System.out.println("row " + (i-1) + " : "  + bweightHeight[i-1][0] + " " + bweightHeight[i-1][1]);
         }
 
         gweightHeight = new double[gweightHeightRaw.size()-1][2];

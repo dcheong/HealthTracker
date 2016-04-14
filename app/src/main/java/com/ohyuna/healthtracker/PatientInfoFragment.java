@@ -415,9 +415,18 @@ public class PatientInfoFragment extends Fragment {
             age.setText(ageArray[0] + " days" + ageArray[1] + " months" + ageArray[2] + " years");
             ageinDays = 365 * ageArray[2] + (int)(30.5 * ageArray[1]) + ageArray[0];
             ageinMonths = 12 * ageArray[2] + ageArray[1] + (int) Math.round(ageArray[0]/30.5);
+            if (ageinMonths < 36 && editing) {
+                headCirc.setFocusableInTouchMode(true);
+                headCirc.setAlpha(1.0f);
+            } else {
+                headCirc.setFocusableInTouchMode(false);
+                headCirc.setAlpha(0.5f);
+            }
             return ageArray[0];
         } else {
             ageinDays = -1;
+            headCirc.setFocusableInTouchMode(false);
+            headCirc.setAlpha(0.5f);
             age.setText("");
             return -1;
         }

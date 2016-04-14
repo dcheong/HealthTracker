@@ -140,9 +140,12 @@ public class PatientGraphsFragment extends Fragment {
                 zwamult = -28.0645f;
             }
             float x2 = x1;
-            float y2 = (float)(height * zwamult) + 910;
-            float x3 = (float)(weight * 38.38) + 135;
-            float y3 = (float)((height - 45) * -11.4) + 900;
+
+            float y2 = (float)(weight * zwamult) + 910;
+            System.out.println(x2);
+            System.out.println(y2);
+            float y3 = (float)(weight * -25.147) + 900;
+            float x3 = (float)((height - 45) * 17.4) + 135;
             cv.drawPoint(x1,y1, paint);
             cv1.drawPoint(x2,y2, paint);
             cv2.drawPoint(x3,y3, paint);

@@ -162,15 +162,8 @@ public class Create extends AppCompatActivity {
         gender.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked) {
-                    genderString = "F";
-                    gen = true;
+                    gen = isChecked;
                     updateZ();
-                } else {
-                    genderString = "M";
-                    gen = false;
-                    updateZ();
-                }
             }
         });
         image.setOnClickListener(new View.OnClickListener(){
@@ -266,9 +259,18 @@ public class Create extends AppCompatActivity {
             age.setText(ageArray[0] + " days" + ageArray[1] + " months" + ageArray[2] + " years");
             ageinDays = 365 * ageArray[2] + (int)(30.5 * ageArray[1]) + ageArray[0];
             ageinMonths = 12 * ageArray[2] + ageArray[1] + (int) Math.round(ageArray[0]/30.5);
+            if (ageinMonths < 36) {
+                headCirc.setFocusableInTouchMode(true);
+                headCirc.setAlpha(1.0f);
+            } else {
+                headCirc.setFocusableInTouchMode(false);
+                headCirc.setAlpha(0.5f);
+            }
             return ageArray[0];
         } else {
             ageinDays = -1;
+            headCirc.setFocusableInTouchMode(false);
+            headCirc.setAlpha(0.5f);
             age.setText("");
             return -1;
         }
