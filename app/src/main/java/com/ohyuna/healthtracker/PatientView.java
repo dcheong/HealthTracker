@@ -125,11 +125,11 @@ public class PatientView extends AppCompatActivity
                 case 0:
                     return "INFO";
                 case 1:
-                    return "GRAPHS";
+                    return "GRAFICAS";
                 case 2:
-                    return "TABLES";
+                    return "TABLAS";
                 case 3:
-                    return "NOTES";
+                    return "NOTAS";
             }
             return null;
         }

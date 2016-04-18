@@ -34,7 +34,16 @@ public class ZScore {
     public ZScore(Context context) {
         load(context);
     }
-    public double getHA(double height, int age, boolean gender) {
+    public double getHA(double height, int age, boolean gender, boolean recumbent) {
+        if (age < 24) {
+            if (!recumbent) {
+                height = height + 0.7;
+            }
+        } else {
+            if (recumbent) {
+                height = height - 0.7;
+            }
+        }
         double zscore;
         if (!gender) {
             if (age <= 24 && age >= 0) {
@@ -96,7 +105,16 @@ public class ZScore {
         }
         return zscore;
     }
-    public double getWH(double weight, double height, boolean gender) {
+    public double getWH(int age, double weight, double height, boolean gender, boolean recumbent) {
+        if (age < 24) {
+            if (!recumbent) {
+                height = height + 0.7;
+            }
+        } else {
+            if (recumbent) {
+                height = height - 0.7;
+            }
+        }
         System.out.println("Getting ZWH for weight " + weight + " height" + height + "gender = " + gender);
         int row = (int)((height - 65) * 10.01818);
         System.out.println("row: " + row);

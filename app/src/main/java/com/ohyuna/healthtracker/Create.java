@@ -1,21 +1,31 @@
 package com.ohyuna.healthtracker;
 
+import android.app.Activity;
 import android.app.Application;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.Switch;
 import android.widget.TextView;
 
@@ -34,7 +44,7 @@ public class Create extends AppCompatActivity {
     private boolean gen;
     private ZScore zscore;
     @Bind(R.id.image)
-    ImageView image;
+    CircleImageView image;
     @Bind(R.id.firstName)
     EditText firstName;
     @Bind(R.id.secondName)
@@ -67,17 +77,31 @@ public class Create extends AppCompatActivity {
     Button save;
     @Bind(R.id.gender)
     Switch gender;
+    @Bind(R.id.albendazoleCheck)
+    CheckBox albendazoleCheck;
+    @Bind(R.id.chispitasCheck)
+    CheckBox chispitasCheck;
+    @Bind(R.id.recumbentCheck)
+    CheckBox recumbentCheck;
+    boolean recumbent;
+    String albendazoleDate;
+    String chispitasDate;
+    boolean haveImage;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create);
         ButterKnife.bind(this);
+        haveImage = false;
         ageNum = 0; heightNum = 0; weightNum = 0;
         ageinDays = 0; ageinMonths = 0;
-        genderString = "M";
         gen = false;
+        recumbent = false;
+        albendazoleDate = null;
+        chispitasDate = null;
         zscore = new ZScore(this);
+        image.setImageResource(R.drawable.cameraicon);
         cancel.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -89,6 +113,25 @@ public class Create extends AppCompatActivity {
             public void onClick(View v) {
                 writePatient();
                 finish();
+            }
+        });
+        recumbentCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                recumbent = isChecked;
+                updateZ();
+            }
+        });
+        chispitasCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                showPopup(Create.this, 0);
+            }
+        });
+        albendazoleCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                showPopup(Create.this, 1);
             }
         });
         bDay.addTextChangedListener(new TextWatcher() {
@@ -185,6 +228,7 @@ public class Create extends AppCompatActivity {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             image.setImageBitmap(imageBitmap);
+            haveImage = true;
         }
     }
     private void savePicture(Bitmap bm, String imgName) {
@@ -209,7 +253,7 @@ public class Create extends AppCompatActivity {
     }
     public void updateZ() {
         if(height.getText().toString().length()!=0 && ageinDays != -1) {
-            String hA = String.format("%4.2f",zscore.getHA(Double.parseDouble(height.getText().toString()),ageinMonths, gen));
+            String hA = String.format("%4.2f",zscore.getHA(Double.parseDouble(height.getText().toString()),ageinMonths, gen, recumbent));
             heightAge.setText(hA);
         }
         if(weight.getText().toString().length()!=0 && ageinDays != -1) {
@@ -218,7 +262,7 @@ public class Create extends AppCompatActivity {
 
         }
         if(weight.getText().toString().length()!=0 && height.getText().toString().length()!=0) {
-            String wH = String.format("%4.2f",zscore.getWH(Double.parseDouble(weight.getText().toString()),Double.parseDouble(height.getText().toString()),gen));
+            String wH = String.format("%4.2f",zscore.getWH(ageinMonths, Double.parseDouble(weight.getText().toString()),Double.parseDouble(height.getText().toString()),gen, recumbent));
             weightHeight.setText(wH);
         }
     }
@@ -227,6 +271,12 @@ public class Create extends AppCompatActivity {
         db.start();
         String birthdate = bDay.getText().toString() + "-" + bMonth.getText().toString() + "-" + bYear.getText().toString();
         Double hCirc;
+        int recumbInt;
+        if (recumbent) {
+            recumbInt = 1;
+        } else {
+            recumbInt = 0;
+        }
         if (headCirc.getText().toString().trim().length()>0) {
             hCirc = Double.parseDouble(headCirc.getText().toString());
         } else {
@@ -239,14 +289,17 @@ public class Create extends AppCompatActivity {
                 Double.parseDouble(height.getText().toString()),
                 Double.parseDouble(weight.getText().toString()),
                 hCirc,
+                recumbInt,
                 Double.parseDouble(heightAge.getText().toString()),
                 Double.parseDouble(weightAge.getText().toString()),
                 Double.parseDouble(weightHeight.getText().toString()),
                 gen);
         BitmapDrawable bMap = (BitmapDrawable) image.getDrawable();
-        if (bMap != null) {
+        if (bMap != null && haveImage) {
             savePicture(bMap.getBitmap(), String.valueOf(patientid));
         }
+        db.addAlbendazole(patientid, albendazoleDate);
+        db.addChispitas(patientid, chispitasDate);
         db.close();
     }
     public double getAge() {
@@ -274,6 +327,68 @@ public class Create extends AppCompatActivity {
             age.setText("");
             return -1;
         }
-
     }
+    //chispitas = pillType 0, albendazole = pillType 1
+    public void showPopup(final Activity context, int pillType) {
+        LinearLayout viewGroup = (LinearLayout) context.findViewById(R.id.pilldateEntry);
+        LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View layout = layoutInflater.inflate(R.layout.pill_date_entry, viewGroup);
+        final int pType = pillType;
+        final PopupWindow popup = new PopupWindow(context);
+        popup.setContentView(layout);
+        popup.setWidth(WindowManager.LayoutParams.WRAP_CONTENT);
+        popup.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
+        popup.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        popup.setElevation(10);
+        popup.setFocusable(true);
+        popup.showAtLocation(layout, Gravity.CENTER, 0,0);
+        Button ok = (Button) layout.findViewById(R.id.enter);
+        Button cancel = (Button) layout.findViewById(R.id.cancelDate);
+        final EditText day = (EditText) layout.findViewById(R.id.day);
+        final EditText month = (EditText) layout.findViewById(R.id.month);
+        final EditText year = (EditText) layout.findViewById(R.id.year);
+        popup.setOnDismissListener(new PopupWindow.OnDismissListener(){
+            @Override
+            public void onDismiss(){
+                if (pType == 0) {
+                    if (chispitasDate == null) {
+                        chispitasCheck.setChecked(false);
+                    }
+                    if (albendazoleDate == null) {
+                        albendazoleCheck.setChecked(false);
+                    }
+                }
+            }
+        });
+        ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (day.getText().length() > 0 && month.getText().length() > 0 && year.getText().length() > 0) {
+                    if (pType==0) {
+                        chispitasDate = day.getText().toString() + "-" + month.getText().toString() + "-" + year.getText().toString();
+                        chispitasCheck.setChecked(true);
+                    } else {
+                        albendazoleDate = day.getText().toString() + "-" + month.getText().toString() + "-" + year.getText().toString();
+                        albendazoleCheck.setChecked(true);
+                    }
+                    popup.dismiss();
+                }
+            }
+        });
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (pType==0) {
+                    chispitasDate = null;
+                    chispitasCheck.setChecked(false);
+                } else {
+                    albendazoleDate = null;
+                    albendazoleCheck.setChecked(false);
+                }
+                popup.dismiss();
+            }
+        });
+    }
+
+
 }

@@ -77,6 +77,7 @@ public class Landing extends AppCompatActivity {
         secondName = (EditText) layout.findViewById(R.id.secondNameSearch);
         lastName = (EditText) layout.findViewById(R.id.lastNameSearch);
         Button search2 = (Button) layout.findViewById(R.id.search2);
+
         search2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

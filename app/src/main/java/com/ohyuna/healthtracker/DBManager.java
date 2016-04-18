@@ -8,9 +8,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import java.io.File;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Random;
 
 /**
@@ -30,10 +32,10 @@ public class DBManager {
     public void start() {
         htdb = SQLiteDatabase.openOrCreateDatabase(db, null);
         htdb.execSQL("CREATE TABLE IF NOT EXISTS Patients(id INTEGER, first TEXT, second TEXT, last TEXT, birth TEXT, gender INTEGER);");
-        htdb.execSQL("CREATE TABLE IF NOT EXISTS GH(id INTEGER, height REAL, weight REAL, head REAL, zha REAL, zwa REAL, zwh REAL, date TEXT, utime INT);");
+        htdb.execSQL("CREATE TABLE IF NOT EXISTS GH(id INTEGER, height REAL, weight REAL, head REAL, recumbent INTEGER, zha REAL, zwa REAL, zwh REAL, date TEXT, utime INTEGER);");
         htdb.execSQL("CREATE TABLE IF NOT EXISTS Notes(id INTEGER, message TEXT, author TEXT, date TEXT, cat INTEGER, utime INT);");
     }
-    public int newPatient(String first, String second, String last, String birth, double height, double weight, double head, double zha, double zwa, double zwh, boolean gender) {
+    public int newPatient(String first, String second, String last, String birth, double height, double weight, double head, int recumbent, double zha, double zwa, double zwh, boolean gender) {
         Random rand = new Random();
         int newid = rand.nextInt(10000000);
         Cursor checkidExists = null;
@@ -56,6 +58,7 @@ public class DBManager {
         cvGH.put("height", height);
         cvGH.put("weight", weight);
         cvGH.put("head", head);
+        cvGH.put("recumbent", recumbent);
         cvGH.put("zha", zha);
         cvGH.put("zwa", zwa);
         cvGH.put("zwh", zwh);
@@ -76,7 +79,7 @@ public class DBManager {
         System.out.println("patient created with id " + newid);
         return newid;
     }
-    public void updatePatient(int patientid, double height, double weight, double head, double zha, double zwa, double zwh) {
+    public void updatePatient(int patientid, double height, double weight, double head, int recumbent, double zha, double zwa, double zwh) {
         SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
         String date = df.format(Calendar.getInstance().getTime());
         int uTime = (int) (System.currentTimeMillis() /1000L);
@@ -85,6 +88,7 @@ public class DBManager {
         cvGH.put("height", height);
         cvGH.put("weight", weight);
         cvGH.put("head", head);
+        cvGH.put("recumbent", recumbent);
         cvGH.put("zha", zha);
         cvGH.put("zwa", zwa);
         cvGH.put("zwh", zwh);
@@ -92,10 +96,96 @@ public class DBManager {
         cvGH.put("utime", uTime);
         htdb.insert("GH", null, cvGH);
     }
-    public void newNote(int patientid, String message, String author, int cat) {
+    public String[] pillsMostRecent(int patientid) {
+        Cursor c = htdb.query("Notes", null, "id=" + patientid + " AND cat=1", null, null, null, "utime DESC", null);
+        String dateChispitas = null;
+        String dateAlbendazole = null;
+        if (c!=null) {
+            c.moveToFirst();
+            dateChispitas = c.getString(c.getColumnIndex("date"));
+            c.close();
+        }
+        c = htdb.query("Notes", null, "id=" + patientid + " AND cat=2", null, null, null, "utime DESC", null);
+        if (c!=null) {
+            c.moveToFirst();
+            dateAlbendazole = c.getString(c.getColumnIndex("date"));
+            c.close();
+        }
+        return new String[]{dateChispitas, dateAlbendazole};
+    }
+    public boolean[] needPills(int patientid) {
+        String[] dates = pillsMostRecent(patientid);
+        AgeCalc aCalc = new AgeCalc();
         SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
-        String date = df.format(Calendar.getInstance().getTime());
-        int uTime = (int) (System.currentTimeMillis() /1000L);
+        Date lastDateC = null;
+        Date lastDateA = null;
+        Calendar todayCal = Calendar.getInstance();
+        int tDay = todayCal.get(Calendar.DAY_OF_MONTH);
+        int tMonth = todayCal.get(Calendar.MONTH);
+        int tYear = todayCal.get(Calendar.YEAR);
+        Patient checkPatient = getPatientMostRecent(patientid);
+        int[] age = checkPatient.getAge();
+        int ageinMonths = age[1] + age[2] * 12;
+        boolean needChispitas = false;
+        boolean needAlbendazole = false;
+        if (dates[0] != null) {
+            try {
+                lastDateC = df.parse(dates[0]);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            Calendar cRecent = Calendar.getInstance();
+            cRecent.setTime(lastDateC);
+            int cDay = cRecent.get(Calendar.DAY_OF_MONTH);
+            int cMonth = cRecent.get(Calendar.MONTH);
+            int cYear = cRecent.get(Calendar.YEAR);
+            int[] cDuration = aCalc.calculateAgeToDate(cDay, cMonth, cYear, tDay, tMonth, tYear);
+            int cMonthDuration = cDuration[1] + cDuration[2]*12;
+            needChispitas = cMonthDuration >= 3;
+        } else {
+            if (ageinMonths >= 6 && ageinMonths <= 60) {
+                needChispitas = true;
+            }
+        }
+        if (dates[1] != null) {
+            try {
+                lastDateA = df.parse(dates[1]);
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            Calendar aRecent = Calendar.getInstance();
+            aRecent.setTime(lastDateA);
+
+            int aDay = aRecent.get(Calendar.DAY_OF_MONTH);
+            int aMonth = aRecent.get(Calendar.MONTH);
+            int aYear = aRecent.get(Calendar.YEAR);
+
+            int[] aDuration = aCalc.calculateAgeToDate(aDay, aMonth, aYear, tDay, tMonth, tYear);
+            int aMonthDuration = aDuration[1] + aDuration[2]*12;
+            needAlbendazole = aMonthDuration >= 6;
+        } else {
+            if (ageinMonths >= 12 && ageinMonths <= 60) {
+                needAlbendazole = true;
+            }
+        }
+
+        return new boolean[]{needChispitas, needAlbendazole};
+
+    }
+    public void newNote(int patientid, String message, String author, int cat, String inputDate) {
+        SimpleDateFormat df = new SimpleDateFormat("dd-MM-yyyy");
+        String date = inputDate;
+        if (date==null) {
+            date = df.format(Calendar.getInstance().getTime());
+        }
+        Calendar forU = Calendar.getInstance();
+        try {
+            forU.setTime(df.parse(date));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        int uTime = (int) (forU.getTimeInMillis() /1000L);
         ContentValues cv = new ContentValues();
         cv.put("id", patientid);
         cv.put("message", message);
@@ -104,6 +194,16 @@ public class DBManager {
         cv.put("date", date);
         cv.put("utime", uTime);
         htdb.insert("Notes", null, cv);
+    }
+    public void addChispitas(int patientid, String date) {
+        if (date!=null) {
+            newNote(patientid, "Chispitas", "SYSTEM", 1, date);
+        }
+    }
+    public void addAlbendazole(int patientid, String date) {
+        if (date!=null) {
+            newNote(patientid, "Albendazoles", "SYSTEM", 2, date);
+        }
     }
     public Patient getPatientMostRecent (int patientid) {
         System.out.println(patientid);
@@ -122,8 +222,9 @@ public class DBManager {
         double height = c.getDouble(c.getColumnIndex("height"));
         double weight = c.getDouble(c.getColumnIndex("weight"));
         double head = c.getDouble(c.getColumnIndex("head"));
+        int recumbent = c.getInt(c.getColumnIndex("recumbent"));
         c.close();
-        Patient patient = new Patient(patientid, first, second, last, birth, height, weight, head, gender);
+        Patient patient = new Patient(patientid, first, second, last, birth, height, weight, head, recumbent, gender);
         return patient;
     }
     public ArrayList<GHEntry> getPatientGH (int patientid) {
@@ -135,17 +236,18 @@ public class DBManager {
                     double height = c.getDouble(c.getColumnIndex("height"));
                     double weight = c.getDouble(c.getColumnIndex("weight"));
                     double head = c.getDouble(c.getColumnIndex("head"));
+                    int recumbent = c.getInt(c.getColumnIndex("recumbent"));
                     double zha = c.getDouble(c.getColumnIndex("zha"));
                     double zwa = c.getDouble(c.getColumnIndex("zwa"));
                     double zwh = c.getDouble(c.getColumnIndex("zwh"));
                     String date = c.getString(c.getColumnIndex("date"));
                     int uTime = c.getInt(c.getColumnIndex("utime"));
-                    GHEntry ghEntry = new GHEntry(patientid, height, weight, head, zha, zwa, zwh, date, uTime);
+                    GHEntry ghEntry = new GHEntry(patientid, height, weight, head, recumbent, zha, zwa, zwh, date, uTime);
                     ghEntries.add(ghEntry);
                 } while (c.moveToNext());
             }
+            c.close();
         }
-        c.close();
         return ghEntries;
     }
     public ArrayList<Note> getPatientNotes (int patientid) {
@@ -163,8 +265,8 @@ public class DBManager {
                     notes.add(note);
                 } while (c.moveToNext());
             }
+            c.close();
         }
-        c.close();
         return notes;
     }
     public ArrayList<Patient> searchPatients (String first, String second, String last) {
@@ -199,8 +301,8 @@ public class DBManager {
                     patients.add(patient);
                 } while (c.moveToNext());
             }
+            c.close();
         }
-        c.close();
         return patients;
     }
     public void close() {

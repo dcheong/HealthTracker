@@ -11,7 +11,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="47dp"
-        android:text="Patient Search"
+        android:text="Buscar Paciente"
         android:id="@+id/textView8"
         android:gravity="center_vertical|center_horizontal"
         android:background="@android:color/holo_red_light"
@@ -22,26 +22,26 @@
         android:layout_width="200dp"
         android:layout_height="40dp"
         android:id="@+id/firstNameSearch"
-        android:hint="First Name" />
+        android:hint="Nombre" />
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/secondNameSearch"
         android:layout_gravity="center_horizontal"
-        android:hint="Second Name" />
+        android:hint="Segundo Nombre" />
 
     <EditText
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:id="@+id/lastNameSearch"
         android:layout_gravity="center_horizontal"
-        android:hint="Last Name" />
+        android:hint="Apellido" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="search"
+        android:text="Buscar"
         android:id="@+id/search2"
         android:layout_gravity="center_horizontal" />
 </LinearLayout>

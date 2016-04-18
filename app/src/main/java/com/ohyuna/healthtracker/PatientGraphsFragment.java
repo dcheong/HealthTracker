@@ -106,7 +106,7 @@ public class PatientGraphsFragment extends Fragment {
         cv2.drawBitmap(bmap2, 0, 0, null);
         paint = new Paint();
         paint.setColor(Color.rgb(0,0,0));
-        paint.setStrokeWidth(10);
+        paint.setStrokeWidth(20);
         drawPoints(db, cv, cv1, cv2, gender, paint);
         iv.setImageDrawable(new BitmapDrawable(getActivity().getResources(), temp));
         iv1.setImageDrawable(new BitmapDrawable(getActivity().getResources(), temp1));

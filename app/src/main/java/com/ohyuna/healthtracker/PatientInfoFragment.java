@@ -5,19 +5,26 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.text.TextWatcher;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.text.Editable;
@@ -54,6 +61,10 @@ public class PatientInfoFragment extends Fragment {
     private int patientid;
     private Patient patient;
     private DBManager db;
+
+    private String chispitasDate;
+    private String albendazoleDate;
+    private boolean recumbent;
 
     private int ageNum,heightNum,weightNum;
     private int ageinDays, ageinMonths;
@@ -94,6 +105,13 @@ public class PatientInfoFragment extends Fragment {
     CircleImageView pImage;
     @Bind(R.id.gender)
     Switch gender;
+    @Bind(R.id.chispitasCheck)
+    CheckBox chispitasCheck;
+    @Bind(R.id.albendazoleCheck)
+    CheckBox albendazoleCheck;
+    @Bind(R.id.recumbentCheck)
+    CheckBox recumbentCheck;
+    private boolean haveImage;
 
     public PatientInfoFragment() {
         // Required empty public constructor
@@ -138,6 +156,7 @@ public class PatientInfoFragment extends Fragment {
         db.start();
         View view = inflater.inflate(R.layout.fragment_patient_view_info, container, false);
         ButterKnife.bind(this, view);
+        haveImage = false;
         zscore = new ZScore(super.getContext());
         ageNum = 0; heightNum=0; weightNum=0;
         ageinDays = 0; ageinMonths=0;
@@ -148,21 +167,43 @@ public class PatientInfoFragment extends Fragment {
         updateZ();
 
 
-
+        recumbentCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                recumbent = isChecked;
+                updateZ();
+            }
+        });
+        chispitasCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                showPopup(getActivity(), 0);
+            }
+        });
+        albendazoleCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                showPopup(getActivity(), 1);
+            }
+        });
         editSave.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (editing) {
+                    int recumbInt = recumbentCheck.isChecked()?1:0;
                     db.updatePatient(patientid,
                             Double.parseDouble(height.getText().toString()),
                             Double.parseDouble(weight.getText().toString()),
                             Double.parseDouble(headCirc.getText().toString()),
+                            recumbInt,
                             Double.parseDouble(heightAge.getText().toString()),
                             Double.parseDouble(weightAge.getText().toString()),
                             Double.parseDouble(weightHeight.getText().toString()));
+                    db.addAlbendazole(patientid, albendazoleDate);
+                    db.addChispitas(patientid, chispitasDate);
                     updateInfo();
                     BitmapDrawable bMap = (BitmapDrawable) pImage.getDrawable();
-                    if (bMap != null) {
+                    if (bMap != null && haveImage) {
                         savePicture(bMap.getBitmap(), String.valueOf(patientid));
                     }
                     firstName.setFocusableInTouchMode(false);
@@ -176,7 +217,10 @@ public class PatientInfoFragment extends Fragment {
                     headCirc.setFocusableInTouchMode(false);
                     pImage.setFocusableInTouchMode(false);
                     gender.setClickable(false);
-                    editSave.setText("Edit");
+                    recumbentCheck.setClickable(false);
+                    albendazoleCheck.setClickable(false);
+                    chispitasCheck.setClickable(false);
+                    editSave.setText("Editar");
                     editing = false;
                 } else {
                     editing = true;
@@ -190,8 +234,11 @@ public class PatientInfoFragment extends Fragment {
                     height.setFocusableInTouchMode(true);
                     headCirc.setFocusableInTouchMode(true);
                     pImage.setFocusableInTouchMode(true);
+                    recumbentCheck.setClickable(true);
+                    albendazoleCheck.setClickable(true);
+                    chispitasCheck.setClickable(true);
                     gender.setClickable(true);
-                    editSave.setText("Save");
+                    editSave.setText("Guardar");
                 }
             }
         });
@@ -296,6 +343,9 @@ public class PatientInfoFragment extends Fragment {
 
     public void updateInfo() {
         patient = db.getPatientMostRecent(patientid);
+        boolean[] needPills = db.needPills(patientid);
+        chispitasCheck.setChecked(!needPills[0]);
+        albendazoleCheck.setChecked(!needPills[1]);
         gen = patient.gender;
         firstName.setText(patient.first);
         secondName.setText(patient.second);
@@ -305,6 +355,7 @@ public class PatientInfoFragment extends Fragment {
         bMonth.setText(bDayArray[1]);
         bYear.setText(bDayArray[2]);
         gender.setChecked(gen);
+        recumbentCheck.setChecked(patient.recumbent);
         weight.setText(String.valueOf(patient.weight));
         height.setText(String.valueOf(patient.height));
         headCirc.setText(String.valueOf(patient.head));
@@ -315,6 +366,9 @@ public class PatientInfoFragment extends Fragment {
         if (imgFile.exists()) {
             Bitmap bmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
             pImage.setImageBitmap(bmap);
+            haveImage = true;
+        } else {
+            pImage.setImageResource(R.drawable.cameraicon);
         }
     }
     private void dispatchTakePictureIntent() {
@@ -329,6 +383,7 @@ public class PatientInfoFragment extends Fragment {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             pImage.setImageBitmap(imageBitmap);
+            haveImage = true;
         }
     }
     private void savePicture(Bitmap bm, String imgName) {
@@ -353,7 +408,7 @@ public class PatientInfoFragment extends Fragment {
     }
     public void updateZ() {
         if(height.getText().toString().length()!=0 && ageinDays != -1) {
-            String hA = String.format("%4.2f",zscore.getHA(Double.parseDouble(height.getText().toString()),ageinMonths, gen));
+            String hA = String.format("%4.2f",zscore.getHA(Double.parseDouble(height.getText().toString()),ageinMonths, gen, recumbentCheck.isChecked()));
             heightAge.setText(hA);
         }
         if(weight.getText().toString().length()!=0 && ageinDays != -1) {
@@ -362,7 +417,7 @@ public class PatientInfoFragment extends Fragment {
 
         }
         if(weight.getText().toString().length()!=0 && height.getText().toString().length()!=0) {
-            String wH = String.format("%4.2f",zscore.getWH(Double.parseDouble(weight.getText().toString()),Double.parseDouble(height.getText().toString()),gen));
+            String wH = String.format("%4.2f",zscore.getWH(ageinMonths, Double.parseDouble(weight.getText().toString()),Double.parseDouble(height.getText().toString()),gen, recumbentCheck.isChecked()));
             weightHeight.setText(wH);
         }
     }
@@ -441,5 +496,66 @@ public class PatientInfoFragment extends Fragment {
     public void onResume() {
         super.onResume();
         db.start();
+    }
+    //chispitas = pillType 0, albendazole = pillType 1
+    public void showPopup(final Activity context, int pillType) {
+        LinearLayout viewGroup = (LinearLayout) context.findViewById(R.id.pilldateEntry);
+        LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View layout = layoutInflater.inflate(R.layout.pill_date_entry, viewGroup);
+        final int pType = pillType;
+        final PopupWindow popup = new PopupWindow(context);
+        popup.setContentView(layout);
+        popup.setWidth(WindowManager.LayoutParams.WRAP_CONTENT);
+        popup.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
+        popup.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        popup.setElevation(10);
+        popup.setFocusable(false);
+        popup.showAtLocation(layout, Gravity.CENTER, 0,0);
+        Button ok = (Button) layout.findViewById(R.id.enter);
+        Button cancel = (Button) layout.findViewById(R.id.cancelDate);
+        final EditText day = (EditText) layout.findViewById(R.id.day);
+        final EditText month = (EditText) layout.findViewById(R.id.month);
+        final EditText year = (EditText) layout.findViewById(R.id.year);
+        popup.setOnDismissListener(new PopupWindow.OnDismissListener(){
+            @Override
+            public void onDismiss(){
+                if (pType == 0) {
+                    if (chispitasDate == null) {
+                        chispitasCheck.setChecked(false);
+                    }
+                    if (albendazoleDate == null) {
+                        albendazoleCheck.setChecked(false);
+                    }
+                }
+            }
+        });
+        ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (day.getText().length() > 0 && month.getText().length() > 0 && year.getText().length() > 0) {
+                    if (pType==0) {
+                        chispitasDate = day.getText().toString() + "-" + month.getText().toString() + "-" + year.getText().toString();
+                        chispitasCheck.setChecked(true);
+                    } else {
+                        albendazoleDate = day.getText().toString() + "-" + month.getText().toString() + "-" + year.getText().toString();
+                        albendazoleCheck.setChecked(true);
+                    }
+                    popup.dismiss();
+                }
+            }
+        });
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (pType==0) {
+                    chispitasDate = null;
+                    chispitasCheck.setChecked(false);
+                } else {
+                    albendazoleDate = null;
+                    albendazoleCheck.setChecked(false);
+                }
+                popup.dismiss();
+            }
+        });
     }
 }

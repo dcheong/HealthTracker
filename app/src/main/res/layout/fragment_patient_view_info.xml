@@ -14,17 +14,17 @@
         android:id="@+id/image"
         android:minHeight="150dp"
         android:minWidth="150dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignLeft="@+id/heightAge"
         android:focusable="false"
-        android:layout_alignStart="@+id/heightAge" />
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/firstName"
         android:height="50dp"
-        android:hint="First Name"
+        android:hint="Nombre"
         android:layout_alignTop="@+id/image"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -39,7 +39,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/lastName"
         android:height="50dp"
-        android:hint="Last Name"
+        android:hint="Apallido"
         android:layout_below="@+id/secondName"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -55,14 +55,13 @@
         android:inputType="number"
         android:ems="10"
         android:id="@+id/height"
-        android:hint="height"
+        android:hint="talla"
         android:width="150px"
         android:textAlignment="textEnd"
-        android:layout_above="@+id/weight"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
         android:focusable="false"
-        />
+        android:layout_below="@+id/headCirc"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <EditText
         android:layout_width="100dp"
@@ -70,52 +69,47 @@
         android:inputType="number"
         android:ems="10"
         android:id="@+id/weight"
-        android:hint="weight"
+        android:hint="peso"
         android:width="150px"
         android:textAlignment="textEnd"
-        android:layout_marginBottom="10dp"
-        android:layout_above="@+id/done"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
         android:focusable="false"
-        />
+        android:layout_below="@+id/height"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Edit"
+        android:text="editar"
         android:id="@+id/editSave"
         android:width="200px"
         android:textColor="@color/abc_primary_text_material_dark"
         android:height="100px"
         android:background="@android:color/holo_red_light"
-        android:layout_alignBottom="@+id/done"
-        android:layout_alignLeft="@+id/weightHeight"
-        android:layout_alignStart="@+id/weightHeight" />
+        android:layout_below="@+id/weightHeight"
+        android:layout_toLeftOf="@+id/textView7"
+        android:layout_toStartOf="@+id/textView7" />
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="130dp"
         android:layout_height="wrap_content"
-        android:text="Done"
+        android:text="Terminar"
         android:id="@+id/done"
         android:width="200px"
         android:height="100px"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="60dp"
-        android:layout_alignLeft="@+id/bMonth"
-        android:layout_alignStart="@+id/bMonth" />
+        android:layout_below="@+id/weight"
+        android:layout_toRightOf="@+id/bDay"
+        android:layout_toEndOf="@+id/bDay" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Z-Scores"
+        android:text="Puntuacion Z"
         android:id="@+id/textView"
         android:textSize="24dp"
         android:gravity="center"
         android:layout_alignBaseline="@+id/textView12"
         android:layout_alignBottom="@+id/textView12"
-        android:layout_alignLeft="@+id/heightAge"
-        android:layout_alignStart="@+id/heightAge"
         android:layout_alignRight="@+id/image"
         android:layout_alignEnd="@+id/image" />
 
@@ -170,9 +164,9 @@
         android:gravity="center_vertical" />
 
     <TextView
-        android:layout_width="120dp"
+        android:layout_width="40dp"
         android:layout_height="40dp"
-        android:text="height-for-age"
+        android:text="ZHA"
         android:id="@+id/textView5"
         android:gravity="center_vertical"
         android:layout_above="@+id/textView6"
@@ -180,19 +174,19 @@
         android:layout_alignParentEnd="true" />
 
     <TextView
-        android:layout_width="120dp"
+        android:layout_width="40dp"
         android:layout_height="40dp"
-        android:text="weight-for-age"
+        android:text="ZWA"
         android:id="@+id/textView6"
         android:gravity="center_vertical"
-        android:layout_alignTop="@+id/weightAge"
-        android:layout_toRightOf="@+id/weightAge"
-        android:layout_toEndOf="@+id/weightAge" />
+        android:layout_above="@+id/textView7"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
     <TextView
-        android:layout_width="120dp"
+        android:layout_width="40dp"
         android:layout_height="40dp"
-        android:text="weight-for-height"
+        android:text="ZWH"
         android:id="@+id/textView7"
         android:gravity="center_vertical"
         android:layout_alignTop="@+id/weightHeight"
@@ -235,7 +229,7 @@
         android:inputType="number"
         android:ems="10"
         android:id="@+id/bYear"
-        android:hint="yyyy"
+        android:hint="aaaa"
         android:gravity="center"
         android:layout_below="@+id/textView11"
         android:layout_toRightOf="@+id/bMonth"
@@ -249,14 +243,12 @@
         android:inputType="number"
         android:ems="10"
         android:id="@+id/headCirc"
-        android:hint="head"
+        android:hint="cabeza"
         android:gravity="end"
         android:focusable="false"
-        android:layout_alignBaseline="@+id/heightAge"
-        android:layout_alignBottom="@+id/heightAge"
+        android:layout_below="@+id/textView12"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        />
+        android:layout_alignParentStart="true" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -274,15 +266,15 @@
         android:layout_height="wrap_content"
         android:id="@+id/gender"
         android:checked="true"
-        android:layout_below="@+id/image"
+        android:clickable="false"
+        android:layout_below="@+id/lastName"
         android:layout_toLeftOf="@+id/textView11"
-        android:layout_toStartOf="@+id/textView11"
-        android:clickable="false"/>
+        android:layout_toStartOf="@+id/textView11" />
 
     <TextView
         android:layout_width="28dp"
         android:layout_height="26dp"
-        android:text="M"
+        android:text="H"
         android:id="@+id/textView9"
         android:gravity="center"
         android:layout_alignTop="@+id/gender"
@@ -292,7 +284,7 @@
     <TextView
         android:layout_width="20dp"
         android:layout_height="26dp"
-        android:text="F"
+        android:text="M"
         android:id="@+id/textView11"
         android:gravity="center"
         android:layout_alignTop="@+id/gender"
@@ -303,7 +295,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/secondName"
-        android:hint="Second Name"
+        android:hint="Segundo Nombre"
         android:layout_below="@+id/firstName"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -314,19 +306,55 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Measurements"
+        android:text="Las Medidas"
         android:id="@+id/textView12"
         android:textSize="24dp"
-        android:layout_below="@+id/bDay"
+        android:layout_centerVertical="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
     <TextView
         android:layout_width="wrap_content"
-        android:layout_height="40dp"
+        android:layout_height="20dp"
         android:id="@+id/age"
-        android:layout_alignBottom="@+id/bYear"
-        android:layout_alignLeft="@+id/textView"
-        android:layout_alignStart="@+id/textView"
-        android:gravity="center_vertical" />
+        android:gravity="center_vertical"
+        android:layout_below="@+id/bDay"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:textSize="15dp" />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Chispitas"
+        android:id="@+id/chispitasCheck"
+        android:checked="false"
+        android:layout_below="@+id/image"
+        android:layout_toLeftOf="@+id/textView5"
+        android:layout_toStartOf="@+id/textView5"
+        android:focusable="false"
+        />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Albendazole"
+        android:id="@+id/albendazoleCheck"
+        android:layout_below="@+id/bYear"
+        android:layout_alignLeft="@+id/chispitasCheck"
+        android:layout_alignStart="@+id/chispitasCheck"
+        android:checked="false"
+        android:focusable="false"
+        />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="R"
+        android:id="@+id/recumbentCheck"
+        android:checked="false"
+        android:focusable="false"
+        android:layout_alignTop="@+id/textView3"
+        android:layout_toLeftOf="@+id/image"
+        android:layout_toStartOf="@+id/image" />
 </RelativeLayout>

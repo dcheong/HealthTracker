@@ -19,7 +19,7 @@
         android:layout_alignEnd="@+id/password"
         android:layout_alignLeft="@+id/password"
         android:layout_alignStart="@+id/password"
-        android:hint="username" />
+        android:hint="nombre de usuario" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -29,12 +29,12 @@
         android:id="@+id/password"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
-        android:hint="password" />
+        android:hint="contraseña" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Login"
+        android:text="INICIAR"
         android:id="@+id/login"
         android:layout_below="@+id/password"
         android:layout_centerHorizontal="true"
