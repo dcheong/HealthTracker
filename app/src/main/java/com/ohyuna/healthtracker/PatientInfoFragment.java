@@ -509,16 +509,16 @@ public class PatientInfoFragment extends Fragment {
         popup.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
         popup.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
         popup.setElevation(10);
-        popup.setFocusable(false);
-        popup.showAtLocation(layout, Gravity.CENTER, 0,0);
+        popup.setFocusable(true);
+        popup.showAtLocation(layout, Gravity.CENTER, 0, 0);
         Button ok = (Button) layout.findViewById(R.id.enter);
         Button cancel = (Button) layout.findViewById(R.id.cancelDate);
         final EditText day = (EditText) layout.findViewById(R.id.day);
         final EditText month = (EditText) layout.findViewById(R.id.month);
         final EditText year = (EditText) layout.findViewById(R.id.year);
-        popup.setOnDismissListener(new PopupWindow.OnDismissListener(){
+        popup.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
-            public void onDismiss(){
+            public void onDismiss() {
                 if (pType == 0) {
                     if (chispitasDate == null) {
                         chispitasCheck.setChecked(false);
@@ -533,7 +533,7 @@ public class PatientInfoFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (day.getText().length() > 0 && month.getText().length() > 0 && year.getText().length() > 0) {
-                    if (pType==0) {
+                    if (pType == 0) {
                         chispitasDate = day.getText().toString() + "-" + month.getText().toString() + "-" + year.getText().toString();
                         chispitasCheck.setChecked(true);
                     } else {
@@ -547,7 +547,7 @@ public class PatientInfoFragment extends Fragment {
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (pType==0) {
+                if (pType == 0) {
                     chispitasDate = null;
                     chispitasCheck.setChecked(false);
                 } else {

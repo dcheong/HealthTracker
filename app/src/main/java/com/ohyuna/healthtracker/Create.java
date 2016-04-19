@@ -1,18 +1,16 @@
 package com.ohyuna.healthtracker;
 
 import android.app.Activity;
-import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Gravity;
@@ -23,26 +21,19 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
-import java.util.Calendar;
+
+import butterknife.Bind;
+import butterknife.ButterKnife;
 
 public class Create extends AppCompatActivity {
-    private int ageNum,heightNum,weightNum;
-    private int ageinDays, ageinMonths;
-    private String genderString;
-    private boolean gen;
-    private ZScore zscore;
     @Bind(R.id.image)
     CircleImageView image;
     @Bind(R.id.firstName)
@@ -87,6 +78,11 @@ public class Create extends AppCompatActivity {
     String albendazoleDate;
     String chispitasDate;
     boolean haveImage;
+    private int ageNum, heightNum, weightNum;
+    private int ageinDays, ageinMonths;
+    private String genderString;
+    private boolean gen;
+    private ZScore zscore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,17 +90,21 @@ public class Create extends AppCompatActivity {
         setContentView(R.layout.activity_create);
         ButterKnife.bind(this);
         haveImage = false;
-        ageNum = 0; heightNum = 0; weightNum = 0;
-        ageinDays = 0; ageinMonths = 0;
+        ageNum = 0;
+        heightNum = 0;
+        weightNum = 0;
+        ageinDays = 0;
+        ageinMonths = 0;
         gen = false;
         recumbent = false;
         albendazoleDate = null;
         chispitasDate = null;
         zscore = new ZScore(this);
         image.setImageResource(R.drawable.cameraicon);
-        cancel.setOnClickListener(new View.OnClickListener(){
+        cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 finish();
             }
         });
@@ -122,27 +122,30 @@ public class Create extends AppCompatActivity {
                 updateZ();
             }
         });
-        chispitasCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+        chispitasCheck.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            public void onClick(View v) {
                 showPopup(Create.this, 0);
             }
         });
-        albendazoleCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        albendazoleCheck.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            public void onClick(View v) {
                 showPopup(Create.this, 1);
             }
         });
         bDay.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 getAge();
                 updateZ();
             }
+
             @Override
             public void afterTextChanged(Editable s) {
 
@@ -150,13 +153,15 @@ public class Create extends AppCompatActivity {
         });
         bMonth.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 getAge();
                 updateZ();
             }
+
             @Override
             public void afterTextChanged(Editable s) {
 
@@ -164,13 +169,15 @@ public class Create extends AppCompatActivity {
         });
         bYear.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 getAge();
                 updateZ();
             }
+
             @Override
             public void afterTextChanged(Editable s) {
 
@@ -178,12 +185,14 @@ public class Create extends AppCompatActivity {
         });
         height.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 updateZ();
             }
+
             @Override
             public void afterTextChanged(Editable s) {
 
@@ -191,12 +200,14 @@ public class Create extends AppCompatActivity {
         });
         weight.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 updateZ();
             }
+
             @Override
             public void afterTextChanged(Editable s) {
 
@@ -205,32 +216,35 @@ public class Create extends AppCompatActivity {
         gender.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    gen = isChecked;
-                    updateZ();
+                gen = isChecked;
+                updateZ();
             }
         });
-        image.setOnClickListener(new View.OnClickListener(){
+        image.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 dispatchTakePictureIntent();
             }
         });
     }
+
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            if(takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                startActivityForResult(takePictureIntent, 1);
-            }
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, 1);
+        }
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(requestCode==1 && resultCode == RESULT_OK) {
+        if (requestCode == 1 && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
             image.setImageBitmap(imageBitmap);
             haveImage = true;
         }
     }
+
     private void savePicture(Bitmap bm, String imgName) {
         OutputStream fOut = null;
         String strDirectory = Environment.getExternalStorageDirectory().toString();
@@ -251,33 +265,30 @@ public class Create extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
     public void updateZ() {
-        if(height.getText().toString().length()!=0 && ageinDays != -1) {
-            String hA = String.format("%4.2f",zscore.getHA(Double.parseDouble(height.getText().toString()),ageinMonths, gen, recumbent));
+        if (height.getText().toString().length() != 0 && ageinDays != -1) {
+            String hA = String.format("%4.2f", zscore.getHA(Double.parseDouble(height.getText().toString()), ageinMonths, gen, recumbent));
             heightAge.setText(hA);
         }
-        if(weight.getText().toString().length()!=0 && ageinDays != -1) {
-            String wA = String.format("%4.2f",zscore.getWA(Double.parseDouble(weight.getText().toString()),ageinDays, gen));
+        if (weight.getText().toString().length() != 0 && ageinDays != -1) {
+            String wA = String.format("%4.2f", zscore.getWA(Double.parseDouble(weight.getText().toString()), ageinDays, gen));
             weightAge.setText(wA);
 
         }
-        if(weight.getText().toString().length()!=0 && height.getText().toString().length()!=0) {
-            String wH = String.format("%4.2f",zscore.getWH(ageinMonths, Double.parseDouble(weight.getText().toString()),Double.parseDouble(height.getText().toString()),gen, recumbent));
+        if (weight.getText().toString().length() != 0 && height.getText().toString().length() != 0) {
+            String wH = String.format("%4.2f", zscore.getWH(ageinMonths, Double.parseDouble(weight.getText().toString()), Double.parseDouble(height.getText().toString()), gen, recumbent));
             weightHeight.setText(wH);
         }
     }
+
     public void writePatient() {
         DBManager db = new DBManager(Create.this);
         db.start();
         String birthdate = bDay.getText().toString() + "-" + bMonth.getText().toString() + "-" + bYear.getText().toString();
         Double hCirc;
-        int recumbInt;
-        if (recumbent) {
-            recumbInt = 1;
-        } else {
-            recumbInt = 0;
-        }
-        if (headCirc.getText().toString().trim().length()>0) {
+        int recumbInt=recumbent?1:0;
+        if (headCirc.getText().toString().trim().length() > 0) {
             hCirc = Double.parseDouble(headCirc.getText().toString());
         } else {
             hCirc = 0.0;
@@ -302,16 +313,17 @@ public class Create extends AppCompatActivity {
         db.addChispitas(patientid, chispitasDate);
         db.close();
     }
+
     public double getAge() {
-        if(!(bYear.getText().length()==0 || bMonth.getText().length()==0 || bDay.getText().length()==0)) {
+        if (!(bYear.getText().length() == 0 || bMonth.getText().length() == 0 || bDay.getText().length() == 0)) {
             int y = Integer.parseInt(bYear.getText().toString());
             int m = Integer.parseInt(bMonth.getText().toString());
             int d = Integer.parseInt(bDay.getText().toString());
             AgeCalc calc = new AgeCalc();
-            int[] ageArray = calc.calculateAge(d,m,y);
+            int[] ageArray = calc.calculateAge(d, m, y);
             age.setText(ageArray[0] + " days" + ageArray[1] + " months" + ageArray[2] + " years");
-            ageinDays = 365 * ageArray[2] + (int)(30.5 * ageArray[1]) + ageArray[0];
-            ageinMonths = 12 * ageArray[2] + ageArray[1] + (int) Math.round(ageArray[0]/30.5);
+            ageinDays = 365 * ageArray[2] + (int) (30.5 * ageArray[1]) + ageArray[0];
+            ageinMonths = 12 * ageArray[2] + ageArray[1] + (int) Math.round(ageArray[0] / 30.5);
             if (ageinMonths < 36) {
                 headCirc.setFocusableInTouchMode(true);
                 headCirc.setAlpha(1.0f);
@@ -328,6 +340,7 @@ public class Create extends AppCompatActivity {
             return -1;
         }
     }
+
     //chispitas = pillType 0, albendazole = pillType 1
     public void showPopup(final Activity context, int pillType) {
         LinearLayout viewGroup = (LinearLayout) context.findViewById(R.id.pilldateEntry);
@@ -341,15 +354,15 @@ public class Create extends AppCompatActivity {
         popup.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
         popup.setElevation(10);
         popup.setFocusable(true);
-        popup.showAtLocation(layout, Gravity.CENTER, 0,0);
+        popup.showAtLocation(layout, Gravity.CENTER, 0, 0);
         Button ok = (Button) layout.findViewById(R.id.enter);
         Button cancel = (Button) layout.findViewById(R.id.cancelDate);
         final EditText day = (EditText) layout.findViewById(R.id.day);
         final EditText month = (EditText) layout.findViewById(R.id.month);
         final EditText year = (EditText) layout.findViewById(R.id.year);
-        popup.setOnDismissListener(new PopupWindow.OnDismissListener(){
+        popup.setOnDismissListener(new PopupWindow.OnDismissListener() {
             @Override
-            public void onDismiss(){
+            public void onDismiss() {
                 if (pType == 0) {
                     if (chispitasDate == null) {
                         chispitasCheck.setChecked(false);
@@ -364,7 +377,7 @@ public class Create extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (day.getText().length() > 0 && month.getText().length() > 0 && year.getText().length() > 0) {
-                    if (pType==0) {
+                    if (pType == 0) {
                         chispitasDate = day.getText().toString() + "-" + month.getText().toString() + "-" + year.getText().toString();
                         chispitasCheck.setChecked(true);
                     } else {
@@ -378,7 +391,7 @@ public class Create extends AppCompatActivity {
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (pType==0) {
+                if (pType == 0) {
                     chispitasDate = null;
                     chispitasCheck.setChecked(false);
                 } else {
@@ -389,6 +402,4 @@ public class Create extends AppCompatActivity {
             }
         });
     }
-
-
 }

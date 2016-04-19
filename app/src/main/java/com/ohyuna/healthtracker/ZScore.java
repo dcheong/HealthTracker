@@ -115,7 +115,12 @@ public class ZScore {
                 height = height - 0.7;
             }
         }
-        System.out.println("Getting ZWH for weight " + weight + " height" + height + "gender = " + gender);
+        System.out.println("Getting ZWH for weight "
+                + weight
+                + " height"
+                + height
+                + "gender = "
+                + gender);
         int row = (int)((height - 65) * 10.01818);
         System.out.println("row: " + row);
         double zscore;
