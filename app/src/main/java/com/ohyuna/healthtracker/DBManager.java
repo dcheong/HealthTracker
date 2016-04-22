@@ -19,6 +19,9 @@ import java.util.Random;
  * Created by Douglas on 4/8/2016.
  */
 public class DBManager {
+    private final String _INITPATIENTS = "CREATE TABLE IF NOT EXISTS Patients(id INTEGER, first TEXT, second TEXT, last TEXT, birth TEXT, gender INTEGER);";
+    private final String _INITGH = "CREATE TABLE IF NOT EXISTS GH(id INTEGER, height REAL, weight REAL, head REAL, recumbent INTEGER, zha REAL, zwa REAL, zwh REAL, date TEXT, utime INTEGER);";
+    private final String _INITNOTES = "CREATE TABLE IF NOT EXISTS Notes(id INTEGER, message TEXT, author TEXT, date TEXT, cat INTEGER, utime INT);";
     private String pathString;
     private File db;
     private SQLiteDatabase htdb;
@@ -31,9 +34,9 @@ public class DBManager {
     }
     public void start() {
         htdb = SQLiteDatabase.openOrCreateDatabase(db, null);
-        htdb.execSQL("CREATE TABLE IF NOT EXISTS Patients(id INTEGER, first TEXT, second TEXT, last TEXT, birth TEXT, gender INTEGER);");
-        htdb.execSQL("CREATE TABLE IF NOT EXISTS GH(id INTEGER, height REAL, weight REAL, head REAL, recumbent INTEGER, zha REAL, zwa REAL, zwh REAL, date TEXT, utime INTEGER);");
-        htdb.execSQL("CREATE TABLE IF NOT EXISTS Notes(id INTEGER, message TEXT, author TEXT, date TEXT, cat INTEGER, utime INT);");
+        htdb.execSQL(_INITPATIENTS);
+        htdb.execSQL(_INITGH);
+        htdb.execSQL(_INITNOTES);
     }
     public int newPatient(String first, String second, String last, String birth, double height, double weight, double head, int recumbent, double zha, double zwa, double zwh, boolean gender) {
         Random rand = new Random();
@@ -73,9 +76,6 @@ public class DBManager {
         htdb.insert("Patients", null, cvPatients);
         htdb.insert("GH", null, cvGH);
         htdb.insert("Notes", null, cvNotes);
-/*        htdb.execSQL("INSERT INTO Patients VALUES(" + newid + ",'" + first + "','" + second + "','" + last + "','" + birth + ");");
-        htdb.execSQL("INSERT INTO GH VALUES(" + newid + "," + height + "," + weight + "," + head + ",'" + date + "');");
-        htdb.execSQL("INSERT INTO Notes(" + newid + ", 'PATIENT CREATED', 'SYSTEM','" + date + "',0);");*/
         System.out.println("patient created with id " + newid);
         return newid;
     }

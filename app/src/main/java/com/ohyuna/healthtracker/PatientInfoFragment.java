@@ -174,16 +174,20 @@ public class PatientInfoFragment extends Fragment {
                 updateZ();
             }
         });
-        chispitasCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        chispitasCheck.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                showPopup(getActivity(), 0);
+            public void onClick(View v) {
+                if (!chispitasCheck.isChecked()) {
+                    showPopup(getActivity(), 1);
+                }
             }
         });
-        albendazoleCheck.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        albendazoleCheck.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                showPopup(getActivity(), 1);
+            public void onClick(View v) {
+                if (!albendazoleCheck.isChecked()) {
+                    showPopup(getActivity(), 1);
+                }
             }
         });
         editSave.setOnClickListener(new View.OnClickListener() {
